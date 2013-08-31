@@ -16,8 +16,9 @@
 
 @synthesize uiScrollView, pageControl;
 
-const int PAGE_NUM = 100;
+const int PAGE_NUM = 1000;
 
+int currentPage = 0;
 
 - (void)viewDidLoad
 {
@@ -30,7 +31,7 @@ const int PAGE_NUM = 100;
     muDistionary = [NSMutableDictionary dictionaryWithCapacity:3];
     
     NSBundle *bundle = [NSBundle mainBundle];
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 2; i++)
     {
         CGRect frame;
         frame.origin.x = self.uiScrollView.frame.size.width * i;
@@ -56,10 +57,10 @@ const int PAGE_NUM = 100;
     if (!pageControlBeingUsed)
     {
         CGFloat pageWidth = self.uiScrollView.frame.size.width;
-        int page = floor((self.uiScrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
-        NSLog(@"%i",page);
-        self.pageControl.currentPage = page;
-        
+        currentPage = floor((self.uiScrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1;
+        NSLog(@"%i",currentPage);
+        self.pageControl.currentPage = currentPage;
+        [self addNewModelInScrollView:currentPage];
     }
 }
 
@@ -67,10 +68,74 @@ const int PAGE_NUM = 100;
 {
     NSLog(@"beigin. Drag..");
     pageControlBeingUsed = NO;
+    
+}
+
+-(void) addNewModelInScrollView:(int) pageNum
+{
+    if (nil != uiScrollView)
+    {
+        NSLog(@"currentPage : %i",currentPage);
+        
+        NSBundle *bundle = [NSBundle mainBundle];
+                
+        UIView* subview1 = [muDistionary objectForKey:[NSNumber numberWithInt:(pageNum + 2)]];
+        if (nil != subview1 && (pageNum + 2) <= PAGE_NUM)
+        {
+            NSLog(@"remove view with ID: %i",(pageNum + 2));
+            [subview1 removeFromSuperview];
+            [muDistionary removeObjectForKey:[NSNumber numberWithInt:(pageNum + 2)]];
+        }
+        
+        UIView* subview2 = [muDistionary objectForKey:[NSNumber numberWithInt:(pageNum - 2)]];
+        if (nil != subview2 && (pageNum - 2 >= 0))
+        {
+            NSLog(@"remove view with ID: %i",(pageNum - 2));
+            [subview2 removeFromSuperview];
+            [muDistionary removeObjectForKey:[NSNumber numberWithInt:(pageNum - 2)]];
+        }
+        
+        UIView* subview3 = [muDistionary objectForKey:[NSNumber numberWithInt:(pageNum + 1)]];
+        if (nil == subview3 && (pageNum + 1 <= PAGE_NUM))
+        {
+            CGRect frame;
+            frame.origin.x = self.uiScrollView.frame.size.width * (pageNum + 1);
+            frame.origin.y = 0;
+            frame.size = self.uiScrollView.frame.size;
+            
+            subview3 = [[bundle loadNibNamed:@"ViewModel_iPad" owner:self options:nil] lastObject];
+            subview3.frame = frame;
+            [self.uiScrollView addSubview:subview3];
+            
+            NSLog(@"add view with ID: %i",(pageNum + 1));
+            
+            [muDistionary setObject:subview3 forKey:[NSNumber  numberWithInt:(pageNum + 1)]];
+        }
+        
+        UIView* subview4 = [muDistionary objectForKey:[NSNumber numberWithInt:(pageNum - 1)]];
+        if (nil == subview4 && (pageNum - 1 >= 0))
+        {
+            CGRect frame;
+            frame.origin.x = self.uiScrollView.frame.size.width * (pageNum - 1);
+            frame.origin.y = 0;
+            frame.size = self.uiScrollView.frame.size;
+            
+            subview4 = [[bundle loadNibNamed:@"ViewModel_iPad" owner:self options:nil] lastObject];
+            subview4.frame = frame;
+            [self.uiScrollView addSubview:subview4];
+            
+            NSLog(@"add view with ID: %i",(pageNum - 1));
+            
+            [muDistionary setObject:subview4 forKey:[NSNumber  numberWithInt:(pageNum - 1)]];
+        }
+        
+        
+    }
 }
 
 - (void) scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
+    
     NSLog(@"beigin.. Uesd.");
     pageControlBeingUsed = NO;
 }
