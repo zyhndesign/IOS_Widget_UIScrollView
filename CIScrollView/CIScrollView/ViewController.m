@@ -143,11 +143,13 @@ int currentPage = 0;
 - (IBAction)changePage:(id)sender
 {
     NSLog(@"change page...");
+    /*
     CGRect frame;
     frame.origin.x = self.uiScrollView.frame.size.width * self.pageControl.currentPage;
     frame.origin.y = 0;
     frame.size = self.uiScrollView.frame.size;
     [self.uiScrollView scrollRectToVisible:frame animated:YES];
+     */
     pageControlBeingUsed = YES;
 }
 
